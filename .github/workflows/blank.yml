@@ -1,0 +1,50 @@
+name: Create production promotion pull request
+
+on:
+  push:
+    branches:
+      - cypress  # Trigger this workflow when changes are pushed to 'cypress'
+
+permissions:
+  contents: write           # Needed to push changes and create commits
+  pull-requests: write      # Needed to create or update pull requests
+
+jobs:
+  productionPromotion:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the source branch ('main')
+      - uses: actions/checkout@v4
+        with:
+          ref: main  # This makes 'cypress' the working base
+
+      # Step 2: Reset local repo state with latest 'main'
+      - name: Reset promotion branch
+        run: |
+          git fetch origin cypress:cypress         # Fetch latest from 'cypress'
+          git reset --hard cypress              # Reset current branch (cypress) to match 'cypress'
+
+          
+      # Step 2: Create Pull Request from main -> cypress
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.MY_GITHUB_PAT }}  # Use a GitHub Personal Access Token (with repo scope)
+          branch: promote-to-cypress-${{ github.run_number }}
+          base: cypress
+          title: Promote to Production
+          commit-message: Promote to Production
+          # author: rehanaslamtl <175612326+rehanaslamtl@users.noreply.github.com>
+          # committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          delete-branch: false # Delete the branch if it doesn't have an active pull request associated with it
+          draft: false
+          maintainer-can-modify: true
+          body: |
+            Automated promotion from `main` to `cypress` .
+            Please review and merge.
+          # Optional enhancements
+          labels: |
+            automated-pr
+            promote
+          # reviewers: rehanaslamtl
