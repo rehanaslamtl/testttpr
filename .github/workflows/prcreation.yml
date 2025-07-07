@@ -15,12 +15,11 @@ jobs:
         with:
           ref: main
 
-      # Step 2: Create a new branch based on main, then hard reset to cypress
-      - name: Prepare promotion branch
+      # Step 2: Reset local repo state with latest 'main'
+      - name: Reset promotion branch
         run: |
-          git fetch origin cypress:cypress
-          git checkout -b promote-to-main-${{ github.run_number }}
-          git reset --hard cypress
+          git fetch origin cypress:cypress         # Fetch latest from 'main'
+          git reset --hard cypress              # Reset current branch (cypress) to match 'main'
 
       # Step 3: Create the pull request (cypress -> main)
       - name: Create Pull Request
