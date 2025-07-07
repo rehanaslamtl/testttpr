@@ -12,13 +12,12 @@ jobs:
     steps:
       # Step 1: Checkout target branch 'main'
       - uses: actions/checkout@v4
-        with:
-          ref: main
 
       - name: Reset promotion branch
         run: |
-          git fetch origin cypress:cypress
-          git reset --hard cypress
+          git fetch origin cypress:cypress        # Fetch latest cypress
+          git checkout main                       # Switch to main
+          git reset --hard cypress                # Force main to match cypress
 
       # Step 3: Create the pull request (cypress -> main)
       - name: Create Pull Request
