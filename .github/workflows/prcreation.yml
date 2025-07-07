@@ -15,11 +15,12 @@ jobs:
         with:
           ref: main
 
-      # Step 2: Reset local repo state with latest 'main'
       - name: Reset promotion branch
         run: |
-          git fetch origin cypress:cypress         # Fetch latest from 'main'
-          git reset --hard cypress              # Reset current branch (cypress) to match 'main'
+          git status
+          git fetch origin cypress:cypress        # Fetch latest cypress
+          git checkout main                       # Switch to main
+          git reset --hard cypress
 
       # Step 3: Create the pull request (cypress -> main)
       - name: Create Pull Request
@@ -27,7 +28,6 @@ jobs:
         with:
           token: ${{ secrets.MY_GITHUB_PAT }}
           branch: promote-to-main-${{ github.run_number }}
-          base: main  # Important: base is MAIN
           title: Promote Cypress to Main
           commit-message: Promote Cypress to Main
           delete-branch: true
