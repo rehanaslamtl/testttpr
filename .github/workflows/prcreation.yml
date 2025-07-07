@@ -15,7 +15,6 @@ jobs:
 
       - name: Reset promotion branch
         run: |
-          git checkout main                       # Switch to main
           git fetch origin cypress:cypress        # Fetch latest cypress
           git reset --hard cypress                # Force main to match cypress
 
