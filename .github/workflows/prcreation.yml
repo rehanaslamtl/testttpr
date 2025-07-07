@@ -15,9 +15,8 @@ jobs:
 
       - name: Reset promotion branch
         run: |
-          git fetch origin cypress:cypress        # Fetch latest cypress
-          git reset --hard cypress                # Force main to match cypress
-
+          git fetch origin cypress:cypress
+          git reset --hard cypress
       # Step 3: Create the pull request (cypress -> main)
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
