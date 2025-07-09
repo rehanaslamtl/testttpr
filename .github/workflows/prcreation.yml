@@ -13,21 +13,40 @@ jobs:
       # Step 1: Checkout target branch 'main'
       - uses: actions/checkout@v4
         with:
-          ref: main
+          fetch-depth: 0
 
-      # Step 2: Reset local repo state with latest 'main'
+      - name: Capture commit details
+        id: commit_info
+        run: |
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_TITLE="$(git log -1 --pretty=format:%s)"
+          COMMIT_MESSAGE="$(git log -1 --pretty=format:%B)"
+      
+          # Export as outputs
+          echo "sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+          echo "title=$COMMIT_TITLE" >> $GITHUB_OUTPUT
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+
+      # Step 2: Switch to 'main' branch and reset to match 'origin/cypress'
       - name: Reset promotion branch
         run: |
-          git fetch origin cypress:cypress         # Fetch latest from 'main'
-          git reset --hard cypress              # Reset current branch (cypress) to match 'main'
-
+          echo ${{ steps.commit_info.outputs.sha }}
+          echo ${{ steps.commit_info.outputs.title }}
+          git status
+          git checkout main                     # Ensure we're on main
+          git status
+          git reset --hard origin/cypress       # Force main to match cypress
+          git status
+          
       # Step 3: Create the pull request (cypress -> main)
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.MY_GITHUB_PAT }}
-          branch: promote-to-main-${{ github.run_number }}
-          base: main  # Important: base is MAIN
+          # branch: promote-to-main-${{ github.run_number }}
           title: Promote Cypress to Main
           commit-message: Promote Cypress to Main
           delete-branch: true
