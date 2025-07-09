@@ -15,6 +15,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get and print commit details
+        run: |
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_TITLE="$(git log -1 --pretty=format:%s)"
+          COMMIT_MESSAGE="$(git log -1 --pretty=format:%B)"
+      
+          echo "Commit SHA: $COMMIT_SHA"
+          echo "Commit Title: $COMMIT_TITLE"
+          echo "Full Commit Message:"
+          echo "$COMMIT_MESSAGE"
+
+
       # Step 2: Switch to 'main' branch and reset to match 'origin/cypress'
       - name: Reset promotion branch
         run: |
